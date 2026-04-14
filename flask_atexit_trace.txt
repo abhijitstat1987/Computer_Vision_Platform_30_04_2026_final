@@ -1,0 +1,3 @@
+atexit called
+  File "<string>", line 17, in on_exit
+    traceback.print_stack(file=f)

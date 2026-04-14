@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+
+  # ── MySQL Database ──────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: cv_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: vision_platform_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Auto-runs all SQL in alphabetical order on first start (empty data volume)
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  # ── Flask Backend ───────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cv_backend
+    restart: unless-stopped
+    environment:
+      FLASK_ENV: production
+      SECRET_KEY: cv-platform-docker-secret-change-in-prod
+      DB_USER: root
+      DB_PASSWORD: ""
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: vision_platform_db
+      # Allow requests from frontend container and localhost browser
+      CORS_ORIGINS: "http://localhost,http://localhost:80,http://frontend,http://127.0.0.1"
+    ports:
+      - "5000:5000"
+    volumes:
+      # Persist uploaded images across container restarts
+      - uploads_snapshots:/app/uploads/snapshots
+      - uploads_images:/app/uploads/images
+      # Persist training runs (model weights, logs) across container restarts
+      - training_runs:/app/training_runs
+      # Cache downloaded YOLO pretrained weights so they aren't re-downloaded on restart
+      - yolo_cache:/root/.config/Ultralytics
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # ── React Frontend (nginx) ──────────────────────────────────────────────────
+  frontend:
+    build:
+      context: "./Computer Vision Platform"
+      dockerfile: Dockerfile
+      args:
+        # Empty → relative URLs; nginx proxies /api/ and /uploads/ to backend
+        VITE_API_BASE_URL: ""
+    container_name: cv_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+  uploads_snapshots:
+  uploads_images:
+  training_runs:
+  yolo_cache:

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Venv / virtual envs
+venv/
+.venv/
+env/
+
+# Migrations (generated at runtime via flask db upgrade)
+migrations/
+
+# Dev files
+.env
+.env.*
+!.env.example
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Frontend (built separately)
+Computer Vision Platform/
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads & training runs (volume-mounted at runtime)
+uploads/
+training_runs/

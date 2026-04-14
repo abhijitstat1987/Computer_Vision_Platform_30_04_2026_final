@@ -1,0 +1,68 @@
+# Python
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+instance/
+
+# Flask migrations (generated, not source)
+migrations/
+
+# Uploads (user data)
+uploads/snapshots/*
+!uploads/snapshots/.gitkeep
+uploads/label_images/
+uploads/temp/
+
+# YOLO / ML model weights (large binaries)
+*.pt
+*.pth
+*.h5
+*.onnx
+*.tflite
+
+# Training artifacts
+runs/
+training_runs/
+
+# Frontend
+Computer Vision Platform/node_modules/
+Computer Vision Platform/dist/
+Computer Vision Platform/.vite/
+
+# Logs / debug files
+*.log
+tf_thread_debug.txt
+vision_platform_run.txt
+
+# Screenshots & Generated PDFs
+screenshots/
+*.pdf
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code session data
+.claude/
