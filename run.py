@@ -2,7 +2,6 @@ import os
 import sys
 import signal
 import socket
-import http.server
 
 # ── Fix: Ensure venv site-packages takes priority over conda ──
 # The system PYTHONPATH puts C:\ProgramData\miniconda3\Lib\site-packages first,
@@ -39,14 +38,8 @@ def _fast_gethostbyaddr(ip_address):
         return (ip_address, [], [ip_address])
 socket.gethostbyaddr = _fast_gethostbyaddr
 
-# 2. Patch HTTPServer.server_bind to skip the getfqdn call entirely
-_orig_server_bind = http.server.HTTPServer.server_bind
-def _fast_server_bind(self):
-    self.socket.bind(self.server_address)
-    host, port = self.socket.getsockname()[:2]
-    self.server_name = "localhost"
-    self.server_port = port
-http.server.HTTPServer.server_bind = _fast_server_bind
+# The socket-level patches above are sufficient — getfqdn/gethostbyaddr
+# will return instantly for localhost addresses, preventing the hang.
 
 from app import create_app
 

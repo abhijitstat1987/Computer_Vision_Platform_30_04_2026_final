@@ -18,6 +18,8 @@ import { LabelingPlatform } from '@/app/components/labeling-platform';
 import { LabelReview } from '@/app/components/label-review';
 import { ModelBenchmark } from '@/app/components/model-benchmark';
 import { AgentBuilder } from '@/app/components/agent-builder';
+import { AIChatbot } from '@/app/components/ai-chatbot';
+import { AgenticAutomation } from '@/app/components/agentic-automation';
 
 export default function App() {
   const [activeVision, setActiveVision] = useState<'safety' | 'quality'>('safety');
@@ -48,7 +50,9 @@ export default function App() {
             <Route path="/analytics" element={<AnalyticsDashboard />} />
             <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/chatbot" element={<AIChatbot />} />
             <Route path="/agent" element={<AgentBuilder />} />
+            <Route path="/agentic-automation" element={<AgenticAutomation />} />
           </Routes>
         </MainLayout>
       </div>

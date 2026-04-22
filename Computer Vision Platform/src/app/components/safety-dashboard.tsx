@@ -116,29 +116,15 @@ export function SafetyDashboard() {
             <span className="px-2 py-0.5 bg-blue-50 rounded text-xs font-semibold text-blue-700">Live</span>
           </div>
           <ResponsiveContainer width="100%" height={180}>
-            <AreaChart data={safetyDetectionData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorPPE" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id="colorZone" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id="colorFall" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
+            <BarChart data={safetyDetectionData} barCategoryGap={16} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="hour" stroke="#999" tick={{ fontSize: 11 }} />
               <YAxis stroke="#999" tick={{ fontSize: 11 }} />
               <Tooltip {...tooltipStyle} />
-              <Area type="monotone" dataKey="ppe" stroke="#ef4444" fillOpacity={1} fill="url(#colorPPE)" strokeWidth={2} name="PPE Violations" />
-              <Area type="monotone" dataKey="zone" stroke="#f59e0b" fillOpacity={1} fill="url(#colorZone)" strokeWidth={2} name="Zone Violations" />
-              <Area type="monotone" dataKey="fall" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorFall)" strokeWidth={2} name="Fall Risks" />
-            </AreaChart>
+              <Bar dataKey="ppe" fill="#ef4444" name="PPE Violations" />
+              <Bar dataKey="zone" fill="#f59e0b" name="Zone Violations" />
+              <Bar dataKey="fall" fill="#8b5cf6" name="Fall Risks" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
 

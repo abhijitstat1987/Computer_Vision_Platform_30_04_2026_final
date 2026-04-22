@@ -28,6 +28,7 @@ def register_blueprints(app: Flask) -> None:
     from .llm_training       import llm_training_bp
     from .chat               import chat_bp
     from .agent              import agent_bp
+    from .flows              import flows_bp
 
     app.register_blueprint(dashboard_bp,          url_prefix="/api")
     app.register_blueprint(cameras_bp,            url_prefix="/api/cameras")
@@ -56,3 +57,4 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(llm_training_bp,       url_prefix="/api/llm/training")
     app.register_blueprint(chat_bp,               url_prefix="/api/chat")
     app.register_blueprint(agent_bp,              url_prefix="/api/agent")
+    app.register_blueprint(flows_bp,              url_prefix="/api")

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from app.extensions import db
+from app.utils.response import to_ist
 
 
 class ModelConfig(db.Model):

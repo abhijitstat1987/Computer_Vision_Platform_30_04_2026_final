@@ -53,7 +53,13 @@ export function AnalyticsDashboard() {
 
   const pieData = topObjects.map((o, i) => ({ name: o.label, value: o.count, color: COLORS[i % COLORS.length] }));
   const weeklyData = timeData.map(t => ({ day: t.period, detections: t.count }));
-  const stationData = cameraData.slice(0, 6).map(c => ({ station: c.camera_name, detections: c.count }));
+  // Example: Add more metrics for multiple bar chart (simulate with random data for demo)
+  const stationData = cameraData.slice(0, 6).map(c => ({
+    station: c.camera_name,
+    detections: c.count,
+    alerts: Math.floor(Math.random() * (c.count / 2)),
+    faults: Math.floor(Math.random() * (c.count / 3)),
+  }));
 
   if (loading) return (
     <div className="flex items-center justify-center py-24 text-gray-500">
@@ -114,17 +120,19 @@ export function AnalyticsDashboard() {
           )}
         </div>
 
-        {/* Camera Activity */}
+        {/* Camera Activity (Multiple Bar Chart) */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold mb-4">Camera Activity</h3>
           {stationData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={stationData}>
+              <BarChart data={stationData} barCategoryGap={16}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="station" tick={{ fontSize: 11 }} />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="detections" fill="#10b981" name="Detections" />
+                <Bar dataKey="alerts" fill="#ef4444" name="Alerts" />
+                <Bar dataKey="faults" fill="#f59e0b" name="Faults" />
               </BarChart>
             </ResponsiveContainer>
           ) : (
