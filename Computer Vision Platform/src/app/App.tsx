@@ -20,6 +20,7 @@ import { ModelBenchmark } from '@/app/components/model-benchmark';
 import { AgentBuilder } from '@/app/components/agent-builder';
 import { AIChatbot } from '@/app/components/ai-chatbot';
 import { AgenticAutomation } from '@/app/components/agentic-automation';
+import ApprovalAuditPage from '@/app/components/approval-audit-page';
 
 export default function App() {
   const [activeVision, setActiveVision] = useState<'safety' | 'quality'>('safety');
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/chatbot" element={<AIChatbot />} />
             <Route path="/agent" element={<AgentBuilder />} />
             <Route path="/agentic-automation" element={<AgenticAutomation />} />
+            <Route path="/approvals" element={<ApprovalAuditPage />} />
           </Routes>
         </MainLayout>
       </div>

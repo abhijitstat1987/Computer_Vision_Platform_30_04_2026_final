@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // TypeScript interfaces
 interface Agent {
   id: number;
@@ -22,11 +22,7 @@ const mockAgents: Agent[] = [
   { id: 3, name: 'Guidance Agent', status: 'Idle', description: 'Provides suggestions and ensures alignment with goals.' },
 ];
 
-const mockFlows: Flow[] = [
-  { id: 1, name: 'Cloud Platform Build', steps: ['Provision Cloud', 'Deploy Services', 'Configure Security'], comments: [] },
-  { id: 2, name: 'Model Selection', steps: ['Analyze Data', 'Benchmark Models', 'Select Best Model'], comments: [] },
-  { id: 3, name: 'Dynamic Task Flow', steps: ['Define Tasks', 'Assign Agents', 'Monitor Progress'], comments: [] },
-];
+
 
 // Simple error boundary for debugging
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: any }> {
@@ -49,8 +45,14 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
-export const AgentOrchestrationDashboard: React.FC = () => {
-  const [flows, setFlows] = useState<Flow[]>(mockFlows);
+function AgentOrchestrationDashboard() {
+  const [flows, setFlows] = useState<Flow[]>([]);
+  useEffect(() => {
+    fetch('/api/flows')
+      .then(res => res.json())
+      .then(data => setFlows(data))
+      .catch(err => console.error('Failed to fetch flows:', err));
+  }, []);
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
   const [comment, setComment] = useState('');
   const [goal, setGoal] = useState(defaultGoal);
@@ -60,8 +62,8 @@ export const AgentOrchestrationDashboard: React.FC = () => {
   const [newFlowName, setNewFlowName] = useState('');
   const [newFlowSteps, setNewFlowSteps] = useState<string[]>(['']);
   const [newFlowAgents, setNewFlowAgents] = useState<number[]>([mockAgents[0].id]);
-  // Add a new flow
-  const handleCreateFlow = () => {
+
+  const handleCreateFlow = async () => {
     if (!newFlowName.trim() || newFlowSteps.some(s => !s.trim())) return;
     const newFlow: Flow = {
       id: Date.now(),
@@ -69,75 +71,108 @@ export const AgentOrchestrationDashboard: React.FC = () => {
       steps: newFlowSteps,
       comments: [],
     };
-    setFlows([...flows, newFlow]);
+    try {
+      const res = await fetch('/api/flows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newFlow),
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setFlows([...flows, created]);
+      }
+    } catch (err) {
+      console.error('Failed to create flow:', err);
+    }
     setShowCreateModal(false);
     setNewFlowName('');
     setNewFlowSteps(['']);
     setNewFlowAgents([mockAgents[0].id]);
   };
 
-  // Remove a flow
-  const handleDeleteFlow = (flowId: number) => {
-    setFlows(flows.filter(f => f.id !== flowId));
-    if (selectedFlow && selectedFlow.id === flowId) setSelectedFlow(null);
+  const handleDeleteFlow = async (flowId: number) => {
+    try {
+      const res = await fetch(`/api/flows/${flowId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setFlows(flows.filter(f => f.id !== flowId));
+        if (selectedFlow && selectedFlow.id === flowId) setSelectedFlow(null);
+      }
+    } catch (err) {
+      console.error('Failed to delete flow:', err);
+    }
   };
 
-  // Edit steps in a flow (for simplicity, only allow editing steps for selected flow)
-  const handleEditStep = (idx: number, value: string) => {
+  const handleEditStep = async (idx: number, value: string) => {
     if (!selectedFlow) return;
     const updatedSteps = [...selectedFlow.steps];
     updatedSteps[idx] = value;
     const updatedFlow = { ...selectedFlow, steps: updatedSteps };
-    setFlows(flows.map(f => f.id === selectedFlow.id ? updatedFlow : f));
-    setSelectedFlow(updatedFlow);
+    try {
+      const res = await fetch(`/api/flows/${selectedFlow.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedFlow),
+      });
+      if (res.ok) {
+        setFlows(flows.map(f => f.id === selectedFlow.id ? updatedFlow : f));
+        setSelectedFlow(updatedFlow);
+      }
+    } catch (err) {
+      console.error('Failed to update flow:', err);
+    }
   };
 
-  // Assign agent to a step (for selected flow)
   const handleAssignAgent = (stepIdx: number, agentId: number) => {
-    // For demo, just log assignment (can be extended to persist agent assignments per step)
     console.log(`Assign agent ${agentId} to step ${stepIdx}`);
   };
 
   const handleSelectFlow = (flow: Flow) => {
-    console.log('Selecting flow:', flow);
     setSelectedFlow(flow);
   };
-  const handleAddComment = () => {
+
+  const handleAddComment = async () => {
     if (!comment.trim() || !selectedFlow) {
-      console.log('No comment or no flow selected');
       return;
     }
-    setFlows(prevFlows => {
-      const updated = prevFlows.map(f => f.id === selectedFlow.id ? { ...f, comments: [...f.comments, comment] } : f);
-      console.log('Updated flows:', updated);
-      return updated;
-    });
-    setSelectedFlow({ ...selectedFlow, comments: [...selectedFlow.comments, comment] });
+    const updatedFlow = { ...selectedFlow, comments: [...selectedFlow.comments, comment] };
+    try {
+      const res = await fetch(`/api/flows/${selectedFlow.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedFlow),
+      });
+      if (res.ok) {
+        setFlows(flows.map(f => f.id === selectedFlow.id ? updatedFlow : f));
+        setSelectedFlow(updatedFlow);
+      }
+    } catch (err) {
+      console.error('Failed to add comment:', err);
+    }
     setComment('');
   };
+
   const handleGoalSave = () => {
     const newGoal = goalInput.trim() ? goalInput : defaultGoal;
-    console.log('Saving goal:', newGoal);
     setGoal(newGoal);
     setEditingGoal(false);
   };
 
   return (
     <ErrorBoundary>
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Agent Orchestration Dashboard</h2>
-      <div className="mb-6 bg-white rounded shadow p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
-        <span className="font-semibold text-gray-700">Goal:</span>
-        {editingGoal ? (
-          <>
-            <input
-              className="flex-1 border rounded px-2 py-1 text-sm"
-              value={goalInput}
-              onChange={e => setGoalInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleGoalSave(); }}
-              autoFocus
-            />
-            <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm" onClick={handleGoalSave}>Save</button>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4">Agent Orchestration Dashboard</h2>
+        <div className="mb-6 bg-white rounded shadow p-4 flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+          <span className="font-semibold text-gray-700">Goal:</span>
+          {editingGoal ? (
+            <>
+              <input
+                className="flex-1 border rounded px-2 py-1 text-sm"
+                value={goalInput}
+                onChange={e => setGoalInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleGoalSave(); }}
+                autoFocus
+              />
+              <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm" onClick={handleGoalSave}>Save</button>
             <button className="bg-gray-200 px-3 py-1 rounded text-sm" onClick={() => { setEditingGoal(false); setGoalInput(goal); }}>Cancel</button>
           </>
         ) : (
@@ -290,4 +325,6 @@ export const AgentOrchestrationDashboard: React.FC = () => {
     </div>
     </ErrorBoundary>
   );
-};
+}
+
+export default AgentOrchestrationDashboard;

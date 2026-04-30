@@ -9,6 +9,10 @@ def create_app(env: str = None) -> Flask:
     env = env or os.getenv("FLASK_ENV", "development")
     app = Flask(__name__, static_folder=None)
 
+    # ── Real-time (SocketIO) ──
+    from app.realtime import socketio
+    socketio.init_app(app)
+
     # ── Configuration ──────────────────────────────────────────────────────────
     app.config.from_object(config_map.get(env, config_map["default"]))
 

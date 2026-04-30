@@ -2,6 +2,10 @@ from flask import Flask
 
 
 def register_blueprints(app: Flask) -> None:
+    from .agentic_flows      import agentic_flows_bp
+    app.register_blueprint(agentic_flows_bp)
+    from .knowledge_graph    import knowledge_graph_bp
+    app.register_blueprint(knowledge_graph_bp)
     from .dashboard          import dashboard_bp
     from .cameras            import cameras_bp
     from .detections         import detections_bp
@@ -29,6 +33,7 @@ def register_blueprints(app: Flask) -> None:
     from .chat               import chat_bp
     from .agent              import agent_bp
     from .flows              import flows_bp
+    from .approval_state      import approval_state_bp
 
     app.register_blueprint(dashboard_bp,          url_prefix="/api")
     app.register_blueprint(cameras_bp,            url_prefix="/api/cameras")
@@ -58,3 +63,4 @@ def register_blueprints(app: Flask) -> None:
     app.register_blueprint(chat_bp,               url_prefix="/api/chat")
     app.register_blueprint(agent_bp,              url_prefix="/api/agent")
     app.register_blueprint(flows_bp,              url_prefix="/api")
+    app.register_blueprint(approval_state_bp)

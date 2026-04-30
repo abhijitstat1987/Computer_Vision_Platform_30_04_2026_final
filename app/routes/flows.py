@@ -6,11 +6,11 @@ flows_bp = Blueprint('flows', __name__)
 # In-memory store for demo (replace with DB in production)
 flows = []
 
-@flows_bp.route('/api/flows', methods=['GET'])
+@flows_bp.route('/flows', methods=['GET'])
 def get_flows():
     return jsonify(flows)
 
-@flows_bp.route('/api/flows', methods=['POST'])
+@flows_bp.route('/flows', methods=['POST'])
 def create_flow():
     data = request.json
     flow = {
@@ -22,7 +22,7 @@ def create_flow():
     flows.append(flow)
     return jsonify(flow), 201
 
-@flows_bp.route('/api/flows/<int:flow_id>', methods=['PUT'])
+@flows_bp.route('/flows/<int:flow_id>', methods=['PUT'])
 def update_flow(flow_id):
     data = request.json
     for flow in flows:
@@ -33,7 +33,7 @@ def update_flow(flow_id):
             return jsonify(flow)
     return jsonify({'error': 'Flow not found'}), 404
 
-@flows_bp.route('/api/flows/<int:flow_id>', methods=['DELETE'])
+@flows_bp.route('/flows/<int:flow_id>', methods=['DELETE'])
 def delete_flow(flow_id):
     global flows
     flows = [f for f in flows if f['id'] != flow_id]

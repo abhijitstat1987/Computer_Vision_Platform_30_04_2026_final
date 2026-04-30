@@ -41,11 +41,16 @@ socket.gethostbyaddr = _fast_gethostbyaddr
 # The socket-level patches above are sufficient — getfqdn/gethostbyaddr
 # will return instantly for localhost addresses, preventing the hang.
 
+
 from app import create_app
+from app.realtime import socketio
 
 app = create_app()
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, lambda *_: sys.exit(0))
-    print("Starting Flask on http://127.0.0.1:5000 ...", flush=True)
-    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False, threaded=True)
+    print("\nRegistered Flask routes:")
+    for rule in app.url_map.iter_rules():
+        print(rule)
+    print("\nStarting Flask-SocketIO on http://127.0.0.1:5000 ...", flush=True)
+    socketio.run(app, host="127.0.0.1", port=5100, debug=False, use_reloader=False)

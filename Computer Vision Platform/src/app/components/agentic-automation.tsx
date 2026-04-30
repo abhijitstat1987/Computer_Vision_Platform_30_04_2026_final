@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AgentOrchestrationDashboard } from './agent-orchestration-dashboard';
+import AgenticFlowDashboard from './agentic-flow-dashboard';
 
 export const AgenticAutomation = () => {
   const [section, setSection] = useState<'main' | 'orchestration' | 'approval' | 'knowledge'>('main');
@@ -34,7 +34,7 @@ export const AgenticAutomation = () => {
       {section === 'orchestration' && (
         <>
           <button className="mb-4 px-3 py-1 bg-gray-200 rounded" onClick={() => setSection('main')}>← Back</button>
-          <AgentOrchestrationDashboard />
+          <AgenticFlowDashboard />
         </>
       )}
       {section === 'approval' && (
